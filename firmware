@@ -1,0 +1,240 @@
+include "DHT.h"
+#include <TroykaMQ.h>
+#define DHTPIN 2     // what digital pin we're connected to
+#define DHTTYPE DHT11   // DHT 11
+DHT dht(DHTPIN, DHTTYPE);
+#define PIN_MQ9         A1 // пин для mq9
+MQ9 mq9(PIN_MQ9);
+#define INTERVAL_GET_DATA 2000
+#define MQ2PIN     A0 // пин      
+MQ2 mq2(MQ2PIN);
+unsigned long millis_int1=0;   //mq2
+
+int buttonState = 0;
+int lastButtonState = 0;
+int buttonPushCounter = 0;
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x3F,16,2);
+void setup() {
+
+  Serial.begin(9600);
+  lcd.init(); 
+    lcd.backlight();
+lcd.print("Hello, world!");
+  pinMode(7, INPUT);       // пин для кнопки
+
+
+label:
+int a = 0;
+if (buttonPushCounter == 0){
+   lcd.clear();
+     lcd.print("Temperature: ");
+
+while(a==0){
+  float t = dht.readTemperature();
+  lcd.setCursor(0, 1); 
+ lcd.print(t);
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  if (buttonState != lastButtonState) {
+    if (buttonState == HIGH) {
+      delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+  delay(5); 
+if (buttonPushCounter == 1){
+    break;
+    }
+  lastButtonState = buttonState;
+  }     
+  }
+}
+
+if (buttonPushCounter == 1){
+   lcd.clear();
+    lcd.print("Methane:");
+     
+while(a==0){
+  lcd.setCursor(0, 1); 
+  lcd.print(mq9.readMethane());
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    if (buttonState == HIGH) {
+   delay(75); 
+      buttonPushCounter += 1;
+    Serial.println(buttonPushCounter);
+    }
+  delay(5); 
+if (buttonPushCounter == 2){
+  break;
+  }
+    
+  lastButtonState = buttonState;
+  }     
+  }
+}
+if (buttonPushCounter ==2){
+   lcd.clear();
+    lcd.print("CarbonMonoxide: ");
+     
+while(a==0){
+  lcd.setCursor(0, 1); 
+   lcd.print(mq9.readCarbonMonoxide());
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+      delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+  delay(5); 
+if (buttonPushCounter == 3){
+   break;
+  } 
+  lastButtonState = buttonState;
+  }     
+  }
+}
+if (buttonPushCounter ==3){
+   lcd.clear();
+     lcd.print("Propan= "); 
+while(a==0){
+  lcd.setCursor(0, 1); 
+ lcd.print(mq2.readLPG());
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+     delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+  delay(5); 
+if (buttonPushCounter == 4){
+  break;
+  }  
+  lastButtonState = buttonState;
+  }     
+  }
+}
+
+if (buttonPushCounter ==4){
+   lcd.clear();
+    lcd.print("Smoke= ");  
+while(a==0){
+  lcd.setCursor(0, 1); 
+ lcd.print(mq2.readSmoke());
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+      delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+
+if (buttonPushCounter == 5){
+    delay(5); 
+  break;
+  }
+ lastButtonState = buttonState;
+  }     
+  }
+}
+
+if (buttonPushCounter ==5){
+   lcd.clear();
+      lcd.print("Humidity: ");
+     
+while(a==0){
+float h = dht.readHumidity();
+  lcd.setCursor(0, 1); 
+ lcd.print(h);;
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+      delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+if (buttonPushCounter == 6){
+    break;
+  }
+  lastButtonState = buttonState;
+  }     
+  }
+}
+
+if (buttonPushCounter ==6){
+   lcd.clear();
+      lcd.print("LPG ");
+while(a==0){
+  lcd.setCursor(0, 1); 
+ lcd.print(mq9.readLPG());
+    lcd.print(" ppm");
+ buttonState = digitalRead(7);
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+    // if the state has changed, increment the counter
+    if (buttonState == HIGH) {
+      delay(75); 
+      buttonPushCounter += 1;
+ //   lcd.setCursor(0, 1);
+    Serial.println(buttonPushCounter);
+    }
+if (buttonPushCounter == 7){
+     
+  break;
+  } 
+  lastButtonState = buttonState;
+  }     
+  }
+}
+if (buttonPushCounter >= 7){
+  buttonPushCounter = 0;
+  }
+goto label;
+}
+void loop() {
+float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (buttonPushCounter == 6){
+    lcd.clear();
+  lcd.print("Humidity: ");
+   lcd.setCursor(0, 1);  
+  lcd.print(h);
+  lcd.print(" %\t");
+  delay (1000);
+  }
+  if (buttonPushCounter == 7){
+    lcd.clear();
+  lcd.print("Temperature: ");
+   lcd.setCursor(0, 1);  
+  lcd.print(t);
+ lcd.print(" *C ");
+delay (1000);
+  }
+  if (buttonPushCounter >=8 ){
+    lcd.clear();
+  buttonPushCounter = 1;
+  }
+}
